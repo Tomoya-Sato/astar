@@ -16,8 +16,8 @@ The shortest path on 2D map can be found by Astar Search. In this map, the move 
 
 Map is limited to rectangle.  
 The first line is the x size and the y size of map.  
-The second line is the coordinate of the start.  
-The third line is the coordinate of the goal.  
+The second line is the coordinates of the start.  
+The third line is the coordinates of the goal.  
 The following is the move cost separated by ",". The block which has the move cost "0" can't be entered.  
 
 For detail, please look at "sample_map.txt".
