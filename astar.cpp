@@ -4,7 +4,7 @@
 #include <errno.h>
 #include "astar.h"
 
-#define LINE 1024
+#define LINE 1025
 
 void Astar::InputMap() {
 	char ss[LINE];
@@ -45,7 +45,8 @@ void Astar::InputMap() {
 
 		for (int j = 1; j < x_range_; j++) {
 			map_[i][j].map_cost = atoi(strtok(NULL, ","));
-			map_[i][j].status = Status::NONE;
+			if (map_[i][j].map_cost > 0) map_[i][j].status = Status::NONE;
+			else map_[i][j].status = Status::DIST;
 		}
 	}
 }
@@ -60,6 +61,18 @@ void Astar::OpenNode(Coord nd, Coord p) {
 		map_[nd.y][nd.x].parent.y = p.y;
 		openlist_[list_count_] = nd;
 		list_count_++;
+	}
+	else if (map_[nd.y][nd.x].status == Status::OPEN) {
+		int tmp_r_cost, tmp_e_cost, tmp_score;
+		tmp_r_cost = map_[p.y][p.x].r_cost + map_[nd.y][nd.x].map_cost;
+		tmp_e_cost = map_[nd.y][nd.x].e_cost;
+		tmp_score = tmp_r_cost + tmp_e_cost;
+		if (tmp_score < map_[nd.y][nd.x].score) {
+			map_[nd.y][nd.x].score = tmp_score;
+			map_[nd.y][nd.x].r_cost = tmp_r_cost;
+			map_[nd.y][nd.x].parent.x = p.x;
+			map_[nd.y][nd.x].parent.y = p.y;
+		}
 	}
 }
 
@@ -80,7 +93,7 @@ void Astar::CloseNode(Coord nd) {
 void Astar::OpenStart() {
 	map_[start_.y][start_.x].status = Status::OPEN;
 	map_[start_.y][start_.x].r_cost = 0;
-	map_[start_.y][start_.x].e_cost = std::abs(goal_.x - start_.x) + std::abs(goal_.y - goal_.y);
+	map_[start_.y][start_.x].e_cost = std::abs(goal_.x - start_.x) + std::abs(goal_.y - start_.y);
 	map_[start_.y][start_.x].score = map_[start_.y][start_.x].r_cost + map_[start_.y][start_.x].e_cost;
 	map_[start_.y][start_.x].parent.x = -1;
 	map_[start_.y][start_.y].parent.y = -1;
@@ -184,8 +197,11 @@ void Astar::FindPath() {
 		}
 	}
 
+	int total_cost = 0;
+
 	path_map[path[0].y][path[0].x] = 5;
 	for (int i = 1; i < count; i++) {
+		total_cost += map_[path[i].x][path[i].y].map_cost;
 		path_map[path[i].y][path[i].x] = (path[i].x - path[i-1].x) + (path[i].y - path[i-1].y) * 2;
 	}
 
@@ -198,6 +214,7 @@ void Astar::FindPath() {
 		}
 		std::cout << std::endl;
 	}
+	std::cout << "total cost: " << total_cost << std::endl;
 }					
 
 void Astar::DeleteMap() {
@@ -225,10 +242,28 @@ void Astar::debugPrintStatus() {
 				std::cout << "NONE\t";
 			else if (map_[i][j].status == Status::OPEN)
 				std::cout << "OPEN\t";
-			else
+			else if (map_[i][j].status == Status::CLOSED)
 				std::cout << "CLOSED\t";
+			else
+				std::cout << "DIST\t";
+		}
+		std::cout << std::endl;				
+		for (int j = 0; j < x_range_; j++) {
+			std::cout << map_[i][j].map_cost << "\t";
 		}
 		std::cout << std::endl;
+		for (int j = 0; j < x_range_; j++) {
+			std::cout << map_[i][j].r_cost << "\t";
+		}
+		std::cout << std::endl;
+		for (int j = 0; j < x_range_; j++) {
+			std::cout << map_[i][j].e_cost << "\t";
+		}
+		std::cout << std::endl;
+		for (int j = 0; j < x_range_; j++) {
+			std::cout << map_[i][j].score << "\t";
+		}
+		std::cout << std::endl << std::endl;
 	}
 	std::cout << " ------------------------------------- " << std::endl;	
 }

@@ -9,6 +9,7 @@ enum class Status
 	NONE = 0,
 	OPEN = 1,
 	CLOSED = 2,
+	DIST = 3
 };
 
 typedef struct _Coord {
