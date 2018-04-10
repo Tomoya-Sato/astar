@@ -166,8 +166,14 @@ void print_arrow(int x) {
 	case -2:
 		std::cout << "v";
 		break;
+	case 4:
+		std::cout << "S";
+		break;
 	case 5:
 		std::cout << "G";
+		break;
+	case 6:
+		std::cout << "X";
 		break;
 	default:
 		std::cout << x;
@@ -193,24 +199,28 @@ void Astar::FindPath() {
 
 	for (int i = 0; i < y_range_; i++) {
 		for (int j = 0; j < x_range_; j++) {
-			path_map[i][j] = 0;
+			if (map_[i][j].map_cost == 0) path_map[i][j] = 6;
+			else path_map[i][j] = 0;
 		}
 	}
 
 	int total_cost = 0;
 
 	path_map[path[0].y][path[0].x] = 5;
-	for (int i = 1; i < count; i++) {
+	for (int i = 1; i < count-1; i++) {
 		total_cost += map_[path[i].x][path[i].y].map_cost;
 		path_map[path[i].y][path[i].x] = (path[i].x - path[i-1].x) + (path[i].y - path[i-1].y) * 2;
 	}
+
+	total_cost += map_[path[count-1].x][path[count-1].y].map_cost;
+	path_map[path[count-1].y][path[count-1].x] = 4;
 
 	std::cout << std::endl << "the shortest path." << std::endl;
 
 	for (int i = 0; i < y_range_; i++) {
 		for (int j = 0; j < x_range_; j++) {
 			print_arrow(path_map[i][j]);
-			std::cout << "\t";
+			std::cout << " ";
 		}
 		std::cout << std::endl;
 	}
